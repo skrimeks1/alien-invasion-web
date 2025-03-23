@@ -6,24 +6,28 @@ const ctx = canvas.getContext("2d");
 let playerX = 400;
 let playerY = 500;
 const playerSpeed = 5;
+const playerWidth = 50;
+const playerHeight = 50;
 
 // Отрисовка игрока
 function drawPlayer() {
     ctx.fillStyle = "#00FF00"; // Зеленый цвет
-    ctx.fillRect(playerX, playerY, 50, 50); // Квадрат 50x50
+    ctx.fillRect(playerX, playerY, playerWidth, playerHeight); // Квадрат 50x50
 }
 
 // Очистка экрана
 function clearScreen() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#000000"; // Черный цвет
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Заливка экрана черным
 }
 
 // Обработка нажатий клавиш
 document.addEventListener("keydown", (event) => {
+    console.log("Key pressed:", event.key); // Отладочное сообщение
     if (event.key === "ArrowLeft") {
-        playerX -= playerSpeed;
+        playerX = Math.max(0, playerX - playerSpeed); // Не выходит за левую границу
     } else if (event.key === "ArrowRight") {
-        playerX += playerSpeed;
+        playerX = Math.min(canvas.width - playerWidth, playerX + playerSpeed); // Не выходит за правую границу
     }
 });
 
