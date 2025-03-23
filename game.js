@@ -9,10 +9,37 @@ const playerSpeed = 5;
 const playerWidth = 50;
 const playerHeight = 50;
 
+// Пришельцы
+const aliens = [];
+const alienWidth = 40;
+const alienHeight = 40;
+const alienSpeed = 2;
+
+// Создаем пришельцев
+function createAliens() {
+    for (let i = 0; i < 10; i++) {
+        aliens.push({
+            x: i * 60 + 50,
+            y: 50,
+            width: alienWidth,
+            height: alienHeight,
+            direction: 1 // 1 - вправо, -1 - влево
+        });
+    }
+}
+
 // Отрисовка игрока
 function drawPlayer() {
     ctx.fillStyle = "#00FF00"; // Зеленый цвет
     ctx.fillRect(playerX, playerY, playerWidth, playerHeight); // Квадрат 50x50
+}
+
+// Отрисовка пришельцев
+function drawAliens() {
+    ctx.fillStyle = "#FF0000"; // Красный цвет
+    aliens.forEach(alien => {
+        ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
+    });
 }
 
 // Очистка экрана
@@ -23,7 +50,6 @@ function clearScreen() {
 
 // Обработка нажатий клавиш
 document.addEventListener("keydown", (event) => {
-    console.log("Key pressed:", event.key); // Отладочное сообщение
     if (event.key === "ArrowLeft") {
         playerX = Math.max(0, playerX - playerSpeed); // Не выходит за левую границу
     } else if (event.key === "ArrowRight") {
@@ -31,12 +57,28 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
+// Движение пришельцев
+function moveAliens() {
+    aliens.forEach(alien => {
+        alien.x += alienSpeed * alien.direction;
+
+        // Если пришелец дошел до края экрана, меняем направление
+        if (alien.x + alien.width > canvas.width || alien.x < 0) {
+            alien.direction *= -1;
+            alien.y += 20; // Сдвигаем пришельцев вниз
+        }
+    });
+}
+
 // Основной игровой цикл
 function gameLoop() {
     clearScreen();
     drawPlayer();
+    drawAliens();
+    moveAliens();
     requestAnimationFrame(gameLoop);
 }
 
-// Запуск игры
+// Инициализация игры
+createAliens();
 gameLoop();
