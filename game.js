@@ -56,6 +56,14 @@ document.addEventListener("keydown", (event) => {
         playerX = Math.max(0, playerX - playerSpeed); // Не выходит за левую границу
     } else if (event.key === "ArrowRight") {
         playerX = Math.min(canvas.width - playerWidth, playerX + playerSpeed); // Не выходит за правую границу
+    } else if (event.key === " ") { // Пробел для стрельбы
+        bullets.push({
+            x: playerX + playerWidth / 2 - bulletWidth / 2,
+            y: playerY,
+            width: bulletWidth,
+            height: bulletHeight
+        });
+        console.log("Снаряд выпущен:", bullets); // Отладочное сообщение
     }
 });
 
@@ -70,15 +78,93 @@ function moveAliens() {
             alien.y += 20; // Сдвигаем пришельцев вниз
         }
     });
-    console.log("Пришельцы двигаются:", aliens); // Отладочное сообщение
+}
+
+// Снаряды
+const bullets = [];
+const bulletWidth = 5;
+const bulletHeight = 15;
+const bulletSpeed = 7;
+
+// Отрисовка снарядов
+function drawBullets() {
+    ctx.fillStyle = "#FFFF00"; // Желтый цвет
+    bullets.forEach(bullet => {
+        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+    });
+}
+
+// Движение снарядов
+function moveBullets() {
+    bullets.forEach((bullet, index) => {
+        bullet.y -= bulletSpeed;
+
+        // Удаляем снаряд, если он вышел за пределы экрана
+        if (bullet.y + bullet.height < 0) {
+            bullets.splice(index, 1);
+        }
+    });
+}
+
+let score = 0;
+
+// Проверка столкновений
+function checkCollisions() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        for (let j = aliens.length - 1; j >= 0; j--) {
+            const bullet = bullets[i];
+            const alien = aliens[j];
+            if (bullet.x < alien.x + alien.width &&
+                bullet.x + bullet.width > alien.x &&
+                bullet.y < alien.y + alien.height &&
+                bullet.y + bullet.height > alien.y) {
+                // Уничтожение пришельца и снаряда
+                aliens.splice(j, 1);
+                bullets.splice(i, 1);
+                score += 10; // Увеличиваем счет
+                console.log("Пришелец уничтожен! Счет:", score); // Отладочное сообщение
+                break; // Прерываем внутренний цикл, так как снаряд уже уничтожен
+            }
+        }
+    }
+}
+
+// Отрисовка счета
+function drawScore() {
+    ctx.fillStyle = "#FFFFFF"; // Белый цвет
+    ctx.font = "20px Arial";
+    ctx.fillText(`Score: ${score}`, 10, 30);
+}
+
+let gameOver = false;
+
+// Проверка конца игры
+function checkGameOver() {
+    aliens.forEach(alien => {
+        if (alien.y + alien.height > playerY) {
+            gameOver = true;
+        }
+    });
 }
 
 // Основной игровой цикл
 function gameLoop() {
+    if (gameOver) {
+        ctx.fillStyle = "#FFFFFF"; // Белый цвет
+        ctx.font = "40px Arial";
+        ctx.fillText("Game Over!", canvas.width / 2 - 100, canvas.height / 2);
+        return; // Останавливаем игровой цикл
+    }
+
     clearScreen();
     drawPlayer();
     drawAliens();
+    drawBullets();
+    drawScore();
     moveAliens();
+    moveBullets();
+    checkCollisions();
+    checkGameOver();
     requestAnimationFrame(gameLoop);
 }
 
