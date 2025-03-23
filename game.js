@@ -14,19 +14,28 @@ const aliens = [];
 const alienWidth = 40;
 const alienHeight = 40;
 const alienSpeed = 2;
+let alienSpeedMultiplier = 1; // Множитель скорости пришельцев
 
 // Создаем пришельцев
 function createAliens() {
-    for (let i = 0; i < 10; i++) {
-        aliens.push({
-            x: i * 60 + 50,
-            y: 50,
-            width: alienWidth,
-            height: alienHeight,
-            direction: 1 // 1 - вправо, -1 - влево
-        });
+    const rows = 2; // Количество рядов пришельцев
+    const cols = 10; // Количество пришельцев в ряду
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            aliens.push({
+                x: col * 60 + 50,
+                y: row * 50 + 50, // Смещение по Y для каждого ряда
+                width: alienWidth,
+                height: alienHeight,
+                direction: 1 // 1 - вправо, -1 - влево
+            });
+        }
     }
-    console.log("Пришельцы созданы:", aliens); // Отладочное сообщение
+
+    // Увеличиваем скорость пришельцев
+    alienSpeedMultiplier += 0.5;
+    console.log("Новый флот пришельцев создан! Скорость:", alienSpeed * alienSpeedMultiplier);
 }
 
 // Отрисовка игрока
@@ -39,7 +48,6 @@ function drawPlayer() {
 function drawAliens() {
     ctx.fillStyle = "#FF0000"; // Красный цвет
     aliens.forEach(alien => {
-        console.log("Отрисовка пришельца:", alien); // Отладочное сообщение
         ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
     });
 }
@@ -70,7 +78,7 @@ document.addEventListener("keydown", (event) => {
 // Движение пришельцев
 function moveAliens() {
     aliens.forEach(alien => {
-        alien.x += alienSpeed * alien.direction;
+        alien.x += alienSpeed * alienSpeedMultiplier * alien.direction;
 
         // Если пришелец дошел до края экрана, меняем направление
         if (alien.x + alien.width > canvas.width || alien.x < 0) {
@@ -126,6 +134,11 @@ function checkCollisions() {
                 break; // Прерываем внутренний цикл, так как снаряд уже уничтожен
             }
         }
+    }
+
+    // Если все пришельцы уничтожены, создаем новый флот
+    if (aliens.length === 0) {
+        createAliens();
     }
 }
 
