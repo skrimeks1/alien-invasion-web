@@ -5,6 +5,7 @@ const ctx = canvas.getContext("2d");
 // Координаты игрока
 let playerX = 400;
 let playerY = 500;
+const playerSpeed = 5;
 
 // Отрисовка игрока
 function drawPlayer() {
@@ -16,6 +17,15 @@ function drawPlayer() {
 function clearScreen() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
+
+// Обработка нажатий клавиш
+document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+        playerX -= playerSpeed;
+    } else if (event.key === "ArrowRight") {
+        playerX += playerSpeed;
+    }
+});
 
 // Основной игровой цикл
 function gameLoop() {
