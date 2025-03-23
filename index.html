@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Invasion</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Alien Invasion</h1>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script src="game.js"></script>
+    <script>
+        async function main() {
+            let pyodide = await loadPyodide();
+            await pyodide.loadPackage("micropip");
+            await pyodide.runPythonAsync(`
+                import micropip
+                await micropip.install('pygame')
+            `);
+            await pyodide.runPythonAsync(`
+                from js import document
+                import pygame
+                import sys
+
+                # Инициализация Pygame
+                pygame.init()
+
+                # Размеры экрана
+                screen_width = 800
+                screen_height = 600
+                screen = pygame.display.set_mode((screen_width, screen_height))
+                pygame.display.set_caption("Alien Invasion")
+
+                # Основной игровой цикл
+                def main():
+                    while True:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                                sys.exit()
+
+                        # Отрисовка фона
+                        screen.fill((0, 0, 0))
+
+                        # Обновление экрана
+                        pygame.display.flip()
+
+                if __name__ == "__main__":
+                    main()
+            `);
+        }
+        main();
+    </script>
+</body>
+</html>
