@@ -26,6 +26,7 @@ function createAliens() {
             direction: 1 // 1 - вправо, -1 - влево
         });
     }
+    console.log("Пришельцы созданы:", aliens); // Отладочное сообщение
 }
 
 // Отрисовка игрока
@@ -38,6 +39,7 @@ function drawPlayer() {
 function drawAliens() {
     ctx.fillStyle = "#FF0000"; // Красный цвет
     aliens.forEach(alien => {
+        console.log("Отрисовка пришельца:", alien); // Отладочное сообщение
         ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
     });
 }
@@ -68,6 +70,7 @@ function moveAliens() {
             alien.y += 20; // Сдвигаем пришельцев вниз
         }
     });
+    console.log("Пришельцы двигаются:", aliens); // Отладочное сообщение
 }
 
 // Основной игровой цикл
