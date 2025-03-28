@@ -148,38 +148,50 @@ function movePlayer(e) {
     }
     
     // Стрельба (пробел, стрелка вверх, W)
-    if (e.key === " " || e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+    if (e.key === " " || e.key === "Space" || e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
         fireBullet();
-        e.preventDefault(); // Блокирует прокрутку страницы при стрельбе
-    }
-}
-// Функция стрельбы 
-function fireBullet() {
-    if (bullets.length < settings.maxBullets) {
-        bullets.push({
-            x: playerX + settings.playerWidth / 2 - settings.bulletWidth / 2,
-            y: playerY,
-            width: settings.bulletWidth,
-            height: settings.bulletHeight
-        });
+        e.preventDefault();
     }
 }
 
-// Функция остановки движения 
+// Функция стрельбы
+function fireBullet() {
+    if (bullets.length >= settings.maxBullets) return;
+    
+    bullets.push({
+        x: playerX + settings.playerWidth / 2 - settings.bulletWidth / 2,
+        y: playerY,
+        width: settings.bulletWidth,
+        height: settings.bulletHeight
+    });
+}
+
+// Функция остановки движения
 function stopPlayerMovement(e) {
-    if (
-        e.key === "ArrowRight" || e.key === "d" || e.key === "D" ||
-        e.key === "ArrowLeft" || e.key === "a" || e.key === "A"
-    ) {
+    const rightKeys = ["ArrowRight", "d", "D"];
+    const leftKeys = ["ArrowLeft", "a", "A"];
+    
+    if (rightKeys.includes(e.key) || leftKeys.includes(e.key)) {
         playerDX = 0;
     }
 }
 
-// Обработчик событий
-window.addEventListener("keydown", movePlayer);
-window.addEventListener("keyup", stopPlayerMovement);
-
+// Инициализация управления
+function initControls() {
+    canvas.tabIndex = 0;
+    canvas.focus();
+    
+    window.addEventListener("keydown", movePlayer);
+    window.addEventListener("keyup", stopPlayerMovement);
+    
+    canvas.addEventListener("keydown", (e) => {
+        if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+}
 
 // Инициализация игры
+initControls();  // Вызываем один раз в начале
 createAliens();
 gameLoop();
