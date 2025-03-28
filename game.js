@@ -1,6 +1,8 @@
-// Инициализация canvas
+// Инициализация игры
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const scoreElement = document.getElementById('score');
+
 canvas.width = 800;
 canvas.height = 600;
 canvas.focus();
@@ -9,65 +11,63 @@ canvas.focus();
 const settings = {
     playerWidth: 50,
     playerHeight: 30,
-    alienWidth: 50,
-    alienHeight: 30,
+    alienWidth: 40,
+    alienHeight: 40,
     bulletWidth: 5,
-    bulletHeight: 10,
-    playerSpeed: 5,
+    bulletHeight: 15,
+    playerSpeed: 8,
     alienSpeed: 1,
-    bulletSpeed: 5,
-    alienDirection: 1,
-    maxBullets: 3,
+    bulletSpeed: 7,
+    alienRows: 4,
+    alienCols: 8,
+    alienPadding: 20
 };
 
-// Игровые переменные
+// Состояние игры
 let playerX = canvas.width / 2 - settings.playerWidth / 2;
-let playerY = canvas.height - settings.playerHeight - 10;
+let playerY = canvas.height - settings.playerHeight - 20;
 let playerDX = 0;
 let bullets = [];
 let aliens = [];
 let score = 0;
-let level = 1;
+let gameOver = false;
+let alienDirection = 1;
+let alienDropDistance = 20;
 
 // Создание пришельцев
 function createAliens() {
     aliens = [];
-    const rows = 4;
-    const cols = 8;
-    const offsetX = 50;
-    const offsetY = 50;
-    
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < settings.alienRows; r++) {
+        for (let c = 0; c < settings.alienCols; c++) {
             aliens.push({
-                x: c * (settings.alienWidth + 20) + offsetX,
-                y: r * (settings.alienHeight + 20) + offsetY
+                x: c * (settings.alienWidth + settings.alienPadding) + 50,
+                y: r * (settings.alienHeight + settings.alienPadding) + 50,
+                width: settings.alienWidth,
+                height: settings.alienHeight
             });
         }
     }
 }
 
 // Управление
-function initControls() {
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') playerDX = settings.playerSpeed;
-        if (e.key === 'ArrowLeft') playerDX = -settings.playerSpeed;
-        if (e.key === ' ' || e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') {
-            fireBullet();
-            e.preventDefault();
-        }
-    });
-    
-    window.addEventListener('keyup', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-            playerDX = 0;
-        }
-    });
+function handleKeyDown(e) {
+    if (e.key === 'ArrowRight') playerDX = settings.playerSpeed;
+    if (e.key === 'ArrowLeft') playerDX = -settings.playerSpeed;
+    if (e.key === ' ' || e.key === 'Space') {
+        fireBullet();
+        e.preventDefault();
+    }
+}
+
+function handleKeyUp(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        playerDX = 0;
+    }
 }
 
 // Стрельба
 function fireBullet() {
-    if (bullets.length < settings.maxBullets) {
+    if (bullets.length < 5) { // Максимум 5 пуль на экране
         bullets.push({
             x: playerX + settings.playerWidth / 2 - settings.bulletWidth / 2,
             y: playerY,
@@ -77,108 +77,115 @@ function fireBullet() {
     }
 }
 
-// Движение пришельцев
-function updateAliens() {
+// Обновление игры
+function update() {
+    if (gameOver) return;
+
+    // Движение игрока
+    playerX += playerDX;
+    playerX = Math.max(0, Math.min(canvas.width - settings.playerWidth, playerX));
+
+    // Движение пуль
+    bullets.forEach(bullet => bullet.y -= settings.bulletSpeed);
+    bullets = bullets.filter(bullet => bullet.y > 0);
+
+    // Движение пришельцев
     let edgeReached = false;
-    
     aliens.forEach(alien => {
-        alien.x += settings.alienSpeed * settings.alienDirection;
-        
+        alien.x += settings.alienSpeed * alienDirection;
         if (alien.x + settings.alienWidth > canvas.width || alien.x < 0) {
             edgeReached = true;
         }
     });
-    
+
     if (edgeReached) {
-        settings.alienDirection *= -1;
-        aliens.forEach(alien => {
-            alien.y += 20;
-        });
+        alienDirection *= -1;
+        aliens.forEach(alien => alien.y += alienDropDistance);
+    }
+
+    // Проверка столкновений
+    checkCollisions();
+
+    // Проверка конца игры
+    if (aliens.some(alien => alien.y + settings.alienHeight >= playerY) || aliens.length === 0) {
+        gameOver = true;
+        setTimeout(() => {
+            alert(aliens.length === 0 ? 'You Win! Score: ' + score : 'Game Over! Score: ' + score);
+            resetGame();
+        }, 100);
     }
 }
 
-// Обновление пуль
-function updateBullets() {
-    bullets = bullets.filter(bullet => {
-        bullet.y -= settings.bulletSpeed;
-        return bullet.y > 0;
-    });
-}
-
-// Проверка столкновений
 function checkCollisions() {
+    // Пули с пришельцами
     bullets.forEach((bullet, bIndex) => {
         aliens.forEach((alien, aIndex) => {
-            if (bullet.x < alien.x + settings.alienWidth &&
-                bullet.x + settings.bulletWidth > alien.x &&
-                bullet.y < alien.y + settings.alienHeight &&
-                bullet.y + settings.bulletHeight > alien.y) {
+            if (bullet.x < alien.x + alien.width &&
+                bullet.x + bullet.width > alien.x &&
+                bullet.y < alien.y + alien.height &&
+                bullet.y + bullet.height > alien.y) {
                 
                 aliens.splice(aIndex, 1);
                 bullets.splice(bIndex, 1);
                 score += 10;
-                
-                if (aliens.length === 0) {
-                    level++;
-                    createAliens();
-                }
+                scoreElement.textContent = 'Score: ' + score;
+                return;
             }
         });
     });
 }
 
 // Отрисовка
-function drawPlayer() {
-    ctx.fillStyle = "#00FF00";
+function draw() {
+    // Очистка экрана
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Игрок
+    ctx.fillStyle = '#4CAF50';
     ctx.fillRect(playerX, playerY, settings.playerWidth, settings.playerHeight);
-}
 
-function drawAliens() {
-    ctx.fillStyle = "#FF0000";
+    // Пришельцы
+    ctx.fillStyle = '#FF5722';
     aliens.forEach(alien => {
-        ctx.fillRect(alien.x, alien.y, settings.alienWidth, settings.alienHeight);
+        ctx.fillRect(alien.x, alien.y, alien.width, alien.height);
     });
-}
 
-function drawBullets() {
-    ctx.fillStyle = "#FFFF00";
+    // Пули
+    ctx.fillStyle = '#FFEB3B';
     bullets.forEach(bullet => {
-        ctx.fillRect(bullet.x, bullet.y, settings.bulletWidth, settings.bulletHeight);
+        ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
     });
 }
 
-function drawScore() {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.font = "20px Arial";
-    ctx.fillText(`Score: ${score}`, 10, 30);
-    ctx.fillText(`Level: ${level}`, canvas.width - 100, 30);
+// Сброс игры
+function resetGame() {
+    playerX = canvas.width / 2 - settings.playerWidth / 2;
+    playerY = canvas.height - settings.playerHeight - 20;
+    playerDX = 0;
+    bullets = [];
+    score = 0;
+    gameOver = false;
+    alienDirection = 1;
+    scoreElement.textContent = 'Score: 0';
+    createAliens();
 }
 
 // Игровой цикл
 function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Обновление
-    playerX += playerDX;
-    playerX = Math.max(0, Math.min(canvas.width - settings.playerWidth, playerX));
-    updateAliens();
-    updateBullets();
-    checkCollisions();
-    
-    // Отрисовка
-    drawPlayer();
-    drawAliens();
-    drawBullets();
-    drawScore();
-    
+    update();
+    draw();
     requestAnimationFrame(gameLoop);
 }
 
-// Запуск игры
+// Инициализация
 function init() {
     createAliens();
-    initControls();
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('click', () => canvas.focus());
     gameLoop();
 }
 
+// Запуск игры при загрузке страницы
 window.addEventListener('load', init);
