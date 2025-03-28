@@ -137,22 +137,20 @@ function createAliens() {
 
 // Управление игроком
 function movePlayer(e) {
-    if (e.key === "ArrowRight") playerDX = settings.playerSpeed;
-    if (e.key === "ArrowLeft") playerDX = -settings.playerSpeed;
-    if (e.key === "ArrowUp") fireBullet();
-}
-
-function stopPlayerMovement(e) {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") playerDX = 0;
-}
-
-// Стрельба
-function fireBullet() {
-    if (bullets.length < settings.maxBullets) {
-        bullets.push({
-            x: playerX + settings.playerWidth / 2 - settings.bulletWidth / 2,
-            y: playerY,
-        });
+    // Движение вправо
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+        playerDX = settings.playerSpeed;
+    }
+    
+    // Движение влево
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+        playerDX = -settings.playerSpeed;
+    }
+    
+    // Стрельба (пробел, стрелка вверх, W)
+    if (e.key === " " || e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+        fireBullet();
+        e.preventDefault(); // Блокирует прокрутку страницы при стрельбе
     }
 }
 
