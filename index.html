@@ -3,27 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alien Invasion</title>
+    <meta name="description" content="Классическая игра Alien Invasion - защитите Землю от нашествия пришельцев!">
+    <meta name="keywords" content="игра, космос, пришельцы, аркада, JavaScript">
+    <title>Alien Invasion - Космическая аркада</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #000;
             color: #fff;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
         }
+        
+        .game-container {
+            margin: 20px 0;
+        }
+        
         canvas {
-            border: 1px solid #fff;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 20px #4CAF50;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            text-shadow: 0 0 10px #4CAF50;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 850px) {
+            canvas {
+                width: 100%;
+                height: auto;
+            }
         }
     </style>
 </head>
 <body>
     <h1>Alien Invasion</h1>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="600">
+            Ваш браузер не поддерживает элемент canvas. Пожалуйста, обновите браузер.
+        </canvas>
+    </div>
     <script src="game.js"></script>
 </body>
 </html>

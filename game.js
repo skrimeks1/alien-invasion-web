@@ -1,7 +1,8 @@
 // Получаем доступ к canvas и контексту
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-
+canvas.width = 800;
+canvas.height = 600;
 // Конфигурация игры
 const settings = {
     playerWidth: 50,
@@ -46,13 +47,20 @@ function gameLoop() {
     });
 
     // Движение пришельцев
-    aliens.forEach(alien => {
-        alien.x += settings.alienSpeed * settings.alienDirection;
-        if (alien.x + settings.alienWidth > canvas.width || alien.x < 0) {
-            settings.alienDirection *= -1;
-            aliens.forEach(a => a.y += 10); // Сдвигаем пришельцев вниз
-        }
-    });
+    let edgeReached = false;
+aliens.forEach(alien => {
+    alien.x += settings.alienSpeed * settings.alienDirection;
+    if (!edgeReached && 
+        (alien.x + settings.alienWidth > canvas.width || alien.x < 0)) {
+        edgeReached = true;
+    }
+});
+
+if (edgeReached) {
+    settings.alienDirection *= -1;
+    aliens.forEach(a => a.y += 10);
+    edgeReached = false;
+}
 
     // Проверка на коллизии снарядов с пришельцами
     bullets.forEach(bullet => {
