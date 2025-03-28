@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,7 @@
     <meta name="description" content="Классическая игра Alien Invasion - защитите Землю от нашествия пришельцев!">
     <meta name="keywords" content="игра, космос, пришельцы, аркада, JavaScript">
     <title>Alien Invasion - Космическая аркада</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
         body {
             margin: 0;
@@ -28,12 +29,19 @@
         canvas {
             border: 2px solid #4CAF50;
             box-shadow: 0 0 20px #4CAF50;
+            outline: none; /* Убирает outline при фокусе */
         }
         
         h1 {
             color: #4CAF50;
             text-shadow: 0 0 10px #4CAF50;
             margin-bottom: 20px;
+        }
+        
+        #gameInstructions {
+            margin-top: 20px;
+            color: #4CAF50;
+            font-size: 14px;
         }
         
         @media (max-width: 850px) {
@@ -47,9 +55,12 @@
 <body>
     <h1>Alien Invasion</h1>
     <div class="game-container">
-        <canvas id="gameCanvas" width="800" height="600">
+        <canvas id="gameCanvas" width="800" height="600" tabindex="0">
             Ваш браузер не поддерживает элемент canvas. Пожалуйста, обновите браузер.
         </canvas>
+    </div>
+    <div id="gameInstructions">
+        Управление: ← → для движения, Пробел/W/↑ для стрельбы
     </div>
     <script src="game.js"></script>
 </body>
