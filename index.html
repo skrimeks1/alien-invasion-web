@@ -4,17 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alien Invasion</title>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
         canvas {
-            display: block;
-            margin: 0 auto;
-            background: #000;
+            border: 1px solid #fff;
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Alien Invasion</h1>
+    <h1>Alien Invasion</h1>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     <script src="game.js"></script>
 </body>
