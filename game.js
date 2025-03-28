@@ -153,6 +153,27 @@ function movePlayer(e) {
         e.preventDefault(); // Блокирует прокрутку страницы при стрельбе
     }
 }
+// Функция стрельбы 
+function fireBullet() {
+    if (bullets.length < settings.maxBullets) {
+        bullets.push({
+            x: playerX + settings.playerWidth / 2 - settings.bulletWidth / 2,
+            y: playerY,
+            width: settings.bulletWidth,
+            height: settings.bulletHeight
+        });
+    }
+}
+
+// Функция остановки движения 
+function stopPlayerMovement(e) {
+    if (
+        e.key === "ArrowRight" || e.key === "d" || e.key === "D" ||
+        e.key === "ArrowLeft" || e.key === "a" || e.key === "A"
+    ) {
+        playerDX = 0;
+    }
+}
 
 // Обработчик событий
 window.addEventListener("keydown", movePlayer);
